@@ -1,0 +1,17 @@
+{
+  "name": "时间计划工作台",
+  "short_name": "时间工作台",
+  "description": "记录时间段、查看日历看板、管理目标计划和日常习惯。",
+  "start_url": ".",
+  "display": "standalone",
+  "background_color": "#f3f5f2",
+  "theme_color": "#23282f",
+  "icons": [
+    {
+      "src": "favicon.svg",
+      "sizes": "64x64",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ]
+}

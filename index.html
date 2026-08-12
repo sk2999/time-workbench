@@ -1,0 +1,465 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="一个用于记录时间段、查看日历看板、管理目标计划和日常习惯的个人时间工作台。" />
+    <meta name="theme-color" content="#23282f" />
+    <meta property="og:title" content="时间计划工作台" />
+    <meta property="og:description" content="记录时间段、日历看板、目标计划、日常习惯和每日上限。" />
+    <meta property="og:type" content="website" />
+    <title>时间计划工作台</title>
+    <link rel="icon" href="favicon.svg" type="image/svg+xml" />
+    <link rel="manifest" href="manifest.webmanifest" />
+    <link rel="stylesheet" href="styles.css?v=46" />
+  </head>
+  <body>
+    <div class="app-shell">
+      <aside class="sidebar">
+        <div class="brand">
+          <div class="brand-mark">T</div>
+          <div>
+            <h1>时间记录</h1>
+            <p>记录、看板、补录、计划</p>
+          </div>
+        </div>
+
+        <nav class="module-nav" aria-label="模块切换">
+          <button class="active" type="button" data-module-target="record">记录时间</button>
+          <button type="button" data-module-target="calendar">日历看板</button>
+          <button type="button" data-module-target="backfill">补录时间</button>
+          <button type="button" data-module-target="plan">做计划</button>
+        </nav>
+
+        <section class="panel data-panel">
+          <div class="section-title compact-title">
+            <h2>数据</h2>
+          </div>
+          <div class="button-row">
+            <button id="exportData" type="button">导出</button>
+            <button id="importData" type="button">导入</button>
+          </div>
+          <input id="importFile" type="file" accept="application/json,.json" hidden />
+          <p id="dataStatus" class="field-hint" aria-live="polite"></p>
+        </section>
+
+        <section class="panel timer-panel module-card" data-module="record">
+          <div class="section-title">
+            <h2>当前记录</h2>
+            <span id="timerState" class="status-pill">未开始</span>
+          </div>
+          <form id="timerForm" class="stack">
+            <label>
+              项目 / 目标
+              <select id="timerProject"></select>
+            </label>
+            <div class="time-inputs">
+              <label>
+                子目标
+                <select id="timerSubgoal"></select>
+              </label>
+            </div>
+            <div class="time-inputs">
+              <label>
+                任务项
+                <select id="timerTask"></select>
+              </label>
+            </div>
+            <div id="activeTimer" class="active-timer" hidden>
+              <span>已进行</span>
+              <strong id="elapsedTime">00:00:00</strong>
+              <small id="activeTimerTarget"></small>
+            </div>
+            <div class="button-row">
+              <button id="startBtn" type="submit" class="primary">开始</button>
+              <button id="stopBtn" type="button" class="danger" disabled>结束</button>
+            </div>
+          </form>
+        </section>
+
+      </aside>
+
+      <main class="workspace">
+        <section class="home-screen" data-module="home">
+          <div class="home-brand">
+            <div class="brand-mark">T</div>
+            <div>
+              <p class="eyebrow">时间计划工作台</p>
+              <h1>选择你现在要做的事</h1>
+            </div>
+          </div>
+          <div class="home-actions">
+            <button type="button" data-module-target="record">
+              <strong>记录时间</strong>
+              <span>开始一个正在进行的时间段</span>
+            </button>
+            <button type="button" data-module-target="calendar">
+              <strong>日历看板</strong>
+              <span>查看日、周、月、年的时间分布</span>
+            </button>
+            <button type="button" data-module-target="backfill">
+              <strong>补录时间</strong>
+              <span>手动补上一段已经发生的记录</span>
+            </button>
+            <button type="button" data-module-target="plan">
+              <strong>做计划</strong>
+              <span>管理目标、子目标和推进进度</span>
+            </button>
+          </div>
+        </section>
+
+        <header class="topbar module-section" data-module="calendar">
+          <div>
+            <p class="eyebrow">个人时间段记录</p>
+            <h2 id="rangeTitle">今天</h2>
+          </div>
+          <div class="topbar-actions">
+            <button id="prevRange" class="icon-btn" title="上一段">‹</button>
+            <button id="todayBtn">今天</button>
+            <button id="nextRange" class="icon-btn" title="下一段">›</button>
+            <div class="segmented" aria-label="视图切换">
+              <button id="dayViewBtn" class="active" data-view="day">日</button>
+              <button id="weekViewBtn" data-view="week">周</button>
+              <button id="monthViewBtn" data-view="month">月</button>
+              <button id="yearViewBtn" data-view="year">年</button>
+            </div>
+          </div>
+        </header>
+
+        <section class="stats-strip module-section" id="statsStrip" data-module="calendar"></section>
+
+        <section class="content-grid">
+          <div class="calendar-panel module-section" data-module="calendar">
+            <div id="calendarHeader" class="calendar-header"></div>
+            <div class="calendar-scroll">
+              <div id="calendarGrid" class="calendar-grid"></div>
+            </div>
+          </div>
+
+          <aside class="detail-panel">
+            <section class="panel manual-panel module-section" data-module="backfill">
+              <div class="section-title">
+                <h2>手动补录</h2>
+              </div>
+              <form id="entryForm" class="stack">
+                <label>
+                  项目 / 目标
+                  <select id="entryProject"></select>
+                </label>
+                <label>
+                  具体描述（可选）
+                  <input id="entryDescription" type="text" placeholder="例如：复盘本周时间分布" autocomplete="off" />
+                </label>
+                <div class="time-inputs">
+                  <label>
+                    子目标
+                    <select id="entrySubgoal"></select>
+                  </label>
+                </div>
+                <div class="time-inputs">
+                  <label>
+                    任务项
+                    <select id="entryTask"></select>
+                  </label>
+                </div>
+                <label>
+                  本次完成量 / 推进
+                  <input id="entryProgress" type="number" min="0" step="0.1" placeholder="量化目标填数量，主观目标填百分比" />
+                </label>
+                <div class="time-inputs">
+                  <label>
+                    开始
+                    <input id="entryStart" type="text" placeholder="2026-07-02 09:00" inputmode="numeric" />
+                  </label>
+                  <label>
+                    结束
+                    <input id="entryEnd" type="text" placeholder="2026-07-02 10:30" inputmode="numeric" />
+                  </label>
+                </div>
+                <button type="submit" class="primary">保存记录</button>
+              </form>
+            </section>
+
+            <section class="panel module-section" data-module="plan">
+              <div class="section-title">
+                <h2>项目 / 目标</h2>
+              </div>
+              <details class="form-disclosure plan-group">
+                <summary>创建</summary>
+                <div class="plan-group-body">
+              <details class="form-disclosure nested-disclosure">
+                <summary>创建项目</summary>
+              <form id="goalForm" class="stack goal-form">
+                <label>
+                  项目名称
+                  <input id="goalName" type="text" placeholder="例如：考公、Keep打卡、开题" autocomplete="off" />
+                </label>
+                <label>
+                  项目类型
+                  <select id="goalKind">
+                    <option value="goal">目标项目</option>
+                    <option value="habit">日常习惯（可含每日子目标）</option>
+                    <option value="limit">每日上限</option>
+                  </select>
+                </label>
+                <label>
+                  重要性
+                  <select id="goalPriority">
+                    <option value="5">5 最高</option>
+                    <option value="4">4 高</option>
+                    <option value="3" selected>3 中</option>
+                    <option value="2">2 低</option>
+                    <option value="1">1 最低</option>
+                  </select>
+                </label>
+                <label>
+                  颜色
+                  <input id="goalColor" type="color" value="#3478f6" aria-label="项目目标颜色" />
+                </label>
+                <div id="goalLimitFields" class="time-inputs" hidden>
+                  <label>
+                    每日上限（分钟）
+                    <input id="goalLimitMinutes" type="number" min="1" step="1" placeholder="例如：45" />
+                  </label>
+                </div>
+                <button type="submit">创建项目</button>
+              </form>
+              </details>
+              <details class="form-disclosure nested-disclosure">
+                <summary>创建子目标</summary>
+              <form id="subgoalForm" class="stack subgoal-form">
+                <div class="section-title compact-title">
+                  <h2>创建子目标</h2>
+                </div>
+                <label>
+                  所属项目
+                  <select id="subgoalProject"></select>
+                </label>
+                <label>
+                  子目标名称
+                  <input id="subgoalName" type="text" placeholder="例如：听课、刷题、文献综述" autocomplete="off" />
+                </label>
+                <label>
+                  子目标类型
+                  <select id="subgoalMode">
+                    <option value="quantified">可量化</option>
+                    <option value="manual">主观进度</option>
+                  </select>
+                </label>
+                <label>
+                  重要性
+                  <select id="subgoalPriority">
+                    <option value="5">5 最高</option>
+                    <option value="4">4 高</option>
+                    <option value="3" selected>3 中</option>
+                    <option value="2">2 低</option>
+                    <option value="1">1 最低</option>
+                  </select>
+                </label>
+                <div class="time-inputs" id="subgoalQuantFields">
+                  <label>
+                    总数
+                    <input id="subgoalTarget" type="number" min="0" step="0.1" placeholder="例如：55" />
+                  </label>
+                  <label>
+                    单位
+                    <input id="subgoalUnit" type="text" placeholder="例如：节、题、页" autocomplete="off" />
+                  </label>
+                </div>
+                <button type="submit">新增子目标</button>
+              </form>
+              </details>
+              <details class="form-disclosure nested-disclosure">
+                <summary>创建任务项</summary>
+              <form id="taskForm" class="stack task-form">
+                <div class="section-title compact-title">
+                  <h2>创建任务项</h2>
+                </div>
+                <label>
+                  所属项目
+                  <select id="taskProject"></select>
+                </label>
+                <label>
+                  所属子目标
+                  <select id="taskSubgoal"></select>
+                </label>
+                <label>
+                  任务项名称
+                  <input id="taskName" type="text" placeholder="例如：第一章听课、完成问卷初稿" autocomplete="off" />
+                </label>
+                <label>
+                  任务项类型
+                  <select id="taskMode">
+                    <option value="quantified">可量化</option>
+                    <option value="manual">主观进度</option>
+                  </select>
+                </label>
+                <label>
+                  重要性
+                  <select id="taskPriority">
+                    <option value="5">5 最高</option>
+                    <option value="4">4 高</option>
+                    <option value="3" selected>3 中</option>
+                    <option value="2">2 低</option>
+                    <option value="1">1 最低</option>
+                  </select>
+                </label>
+                <div class="time-inputs" id="taskQuantFields">
+                  <label>
+                    总数
+                    <input id="taskTarget" type="number" min="0" step="0.1" placeholder="例如：20" />
+                  </label>
+                  <label>
+                    单位
+                    <input id="taskUnit" type="text" placeholder="例如：节、题、页" autocomplete="off" />
+                  </label>
+                </div>
+                <button type="submit">新增任务项</button>
+              </form>
+              </details>
+                </div>
+              </details>
+              <details class="form-disclosure plan-group">
+                <summary>整理</summary>
+                <div class="plan-group-body">
+              <details class="form-disclosure nested-disclosure">
+                <summary>整理项目</summary>
+              <form id="mergeForm" class="stack merge-form">
+                <div class="section-title compact-title">
+                  <h2>整理项目</h2>
+                </div>
+                <label>
+                  合并到
+                  <select id="mergeTarget"></select>
+                </label>
+                <div>
+                  <span class="field-label">要放进去的旧项目</span>
+                  <div id="mergeSourceList" class="merge-source-list"></div>
+                </div>
+                <button type="submit">合并为子目标</button>
+              </form>
+              </details>
+              <details class="form-disclosure nested-disclosure">
+                <summary>整理子目标</summary>
+              <form id="subgoalMergeForm" class="stack merge-form">
+                <div class="section-title compact-title">
+                  <h2>整理子目标</h2>
+                </div>
+                <label>
+                  所属项目
+                  <select id="subgoalMergeProject"></select>
+                </label>
+                <label>
+                  合并到子目标
+                  <select id="subgoalMergeTarget"></select>
+                </label>
+                <div>
+                  <span class="field-label">要变成任务项的子目标</span>
+                  <div id="subgoalMergeSourceList" class="merge-source-list"></div>
+                </div>
+                <button type="submit">合并为任务项</button>
+              </form>
+              </details>
+                </div>
+              </details>
+              <div class="section-title compact-title progress-title">
+                <h2>进度</h2>
+              </div>
+
+              <div id="goalList" class="goal-list"></div>
+            </section>
+
+            <section class="panel module-section" data-module="record">
+              <div class="section-title">
+                <h2>近期记录</h2>
+              </div>
+              <div id="entryList" class="entry-list"></div>
+            </section>
+          </aside>
+        </section>
+      </main>
+    </div>
+
+    <template id="entryCardTemplate">
+      <article class="entry-card">
+        <button class="delete-entry" type="button" title="删除记录">×</button>
+        <button class="edit-entry" type="button" title="编辑记录">编辑</button>
+        <div class="entry-card-head">
+          <span class="project-dot"></span>
+          <strong></strong>
+        </div>
+        <p></p>
+        <time></time>
+        <form class="entry-edit-form" hidden>
+          <label>
+            名称
+            <input data-entry-field="description" type="text" autocomplete="off" />
+          </label>
+          <div class="time-inputs">
+            <label>
+              开始
+              <input data-entry-field="start" type="text" inputmode="numeric" />
+            </label>
+            <label>
+              结束
+              <input data-entry-field="end" type="text" inputmode="numeric" />
+            </label>
+          </div>
+          <div class="time-inputs">
+            <label>
+              关联子目标
+              <select data-entry-field="subgoal"></select>
+            </label>
+            <label>
+              关联任务项
+              <select data-entry-field="task"></select>
+            </label>
+          </div>
+          <label>
+            本次完成量 / 推进
+            <input data-entry-field="progress" type="number" min="0" step="0.1" />
+          </label>
+          <small class="entry-edit-hint"></small>
+          <div class="entry-edit-actions">
+            <button type="submit">保存</button>
+            <button type="button" data-entry-cancel>取消</button>
+          </div>
+          <small class="entry-edit-error" hidden></small>
+        </form>
+      </article>
+    </template>
+
+    <div id="completionModal" class="modal-backdrop" hidden>
+      <section class="modal-panel" role="dialog" aria-modal="true" aria-labelledby="completionTitle">
+        <div class="section-title">
+          <h2 id="completionTitle">完成进度</h2>
+        </div>
+        <p id="completionSubgoal" class="modal-copy"></p>
+        <label>
+          具体描述（可选）
+          <input id="completionDescription" type="text" placeholder="例如：整理产品第一版需求" autocomplete="off" />
+        </label>
+        <label>
+          <span id="completionAmountLabel">本次完成量 / 推进</span>
+          <input id="completionAmount" type="number" min="0" step="0.1" />
+        </label>
+        <p id="completionHint" class="field-hint"></p>
+        <div class="button-row">
+          <button id="completionSkip" type="button">不记录进度</button>
+          <button id="completionSave" type="button" class="primary">保存完成</button>
+        </div>
+      </section>
+    </div>
+
+    <div id="planEditModal" class="modal-backdrop" hidden>
+      <section class="modal-panel plan-edit-panel" role="dialog" aria-modal="true" aria-labelledby="planEditTitle">
+        <div class="section-title">
+          <h2 id="planEditTitle">编辑计划</h2>
+        </div>
+        <form id="planEditForm" class="stack"></form>
+      </section>
+    </div>
+
+    <script src="app.js?v=47"></script>
+  </body>
+</html>
