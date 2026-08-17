@@ -17,7 +17,10 @@
   --shadow-soft: 0 8px 20px rgba(40, 48, 60, 0.06);
 }
 
-.cloud-panel { margin-top: 12px; }
+.cloud-screen { width: min(720px, 100%); margin: 0 auto; padding-top: 18px; }
+.cloud-heading { display: flex; align-items: center; justify-content: space-between; gap: 18px; margin-bottom: 18px; }
+.cloud-heading h2 { margin: 3px 0 0; font-size: 28px; }
+.cloud-panel { padding: 24px; }
 .cloud-panel .section-title { align-items: center; }
 .cloud-auth input { width: 100%; }
 .cloud-choice { display: grid; gap: 8px; padding: 12px; border: 1px solid var(--line); border-radius: 12px; background: #f7f8fa; }
