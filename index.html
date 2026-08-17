@@ -11,7 +11,7 @@
     <title>时间计划工作台</title>
     <link rel="icon" href="favicon.svg" type="image/svg+xml" />
     <link rel="manifest" href="manifest.webmanifest" />
-    <link rel="stylesheet" href="styles.css?v=46" />
+    <link rel="stylesheet" href="styles.css?v=47" />
   </head>
   <body>
     <div class="app-shell">
@@ -29,6 +29,7 @@
           <button type="button" data-module-target="calendar">日历看板</button>
           <button type="button" data-module-target="backfill">补录时间</button>
           <button type="button" data-module-target="plan">做计划</button>
+          <button type="button" data-module-target="cloud">云端与周报</button>
         </nav>
 
         <section class="panel data-panel">
@@ -41,37 +42,6 @@
           </div>
           <input id="importFile" type="file" accept="application/json,.json" hidden />
           <p id="dataStatus" class="field-hint" aria-live="polite"></p>
-        </section>
-
-        <section class="panel cloud-panel">
-          <div class="section-title compact-title">
-            <h2>云端同步与周报</h2>
-            <span id="cloudState" class="status-pill">未登录</span>
-          </div>
-          <form id="authForm" class="stack cloud-auth">
-            <label>邮箱<input id="authEmail" type="email" autocomplete="email" required placeholder="用于登录和接收周报" /></label>
-            <label>密码<input id="authPassword" type="password" autocomplete="current-password" minlength="6" required placeholder="至少 6 位" /></label>
-            <div class="button-row"><button type="submit" class="primary">登录</button><button id="signUpBtn" type="button">注册</button></div>
-          </form>
-          <div id="cloudAccount" class="stack" hidden>
-            <p id="cloudEmail" class="field-hint"></p>
-            <div id="migrationChoice" class="cloud-choice" hidden>
-              <strong>选择第一次同步方式</strong>
-              <p class="field-hint">本地记录不会被自动覆盖。</p>
-              <button id="uploadLocalBtn" type="button" class="primary">上传本地数据</button>
-              <button id="useCloudBtn" type="button">使用云端数据</button>
-            </div>
-            <form id="reportPreferences" class="stack" hidden>
-              <label class="check-row"><input id="reportEnabled" type="checkbox" checked />每周自动生成并发送</label>
-              <div class="time-inputs">
-                <label>发送日<select id="reportDay"><option value="1">周一</option><option value="0">周日</option><option value="5">周五</option></select></label>
-                <label>时间<select id="reportHour"><option value="9">09:00</option><option value="18">18:00</option><option value="20">20:00</option></select></label>
-              </div>
-              <button type="submit">保存周报设置</button>
-            </form>
-            <p id="cloudMessage" class="field-hint" aria-live="polite"></p>
-            <button id="signOutBtn" type="button">退出登录</button>
-          </div>
         </section>
 
         <section class="panel timer-panel module-card" data-module="record">
@@ -136,7 +106,44 @@
               <strong>做计划</strong>
               <span>管理目标、子目标和推进进度</span>
             </button>
+            <button type="button" data-module-target="cloud">
+              <strong>云端与周报</strong>
+              <span>登录、同步记录并设置自动周报</span>
+            </button>
           </div>
+        </section>
+
+        <section class="cloud-screen module-section" data-module="cloud" hidden>
+          <header class="cloud-heading">
+            <div><p class="eyebrow">账户与自动化</p><h2>云端同步与周报</h2></div>
+            <span id="cloudState" class="status-pill">未登录</span>
+          </header>
+          <section class="panel cloud-panel">
+            <form id="authForm" class="stack cloud-auth">
+              <label>邮箱<input id="authEmail" type="email" autocomplete="email" required placeholder="用于登录和接收周报" /></label>
+              <label>密码<input id="authPassword" type="password" autocomplete="current-password" minlength="6" required placeholder="至少 6 位" /></label>
+              <div class="button-row"><button type="submit" class="primary">登录</button><button id="signUpBtn" type="button">注册</button></div>
+            </form>
+            <div id="cloudAccount" class="stack" hidden>
+              <p id="cloudEmail" class="field-hint"></p>
+              <div id="migrationChoice" class="cloud-choice" hidden>
+                <strong>选择第一次同步方式</strong>
+                <p class="field-hint">本地记录不会被自动覆盖。</p>
+                <button id="uploadLocalBtn" type="button" class="primary">上传本地数据</button>
+                <button id="useCloudBtn" type="button">使用云端数据</button>
+              </div>
+              <form id="reportPreferences" class="stack" hidden>
+                <label class="check-row"><input id="reportEnabled" type="checkbox" checked />每周自动生成并发送</label>
+                <div class="time-inputs">
+                  <label>发送日<select id="reportDay"><option value="1">周一</option><option value="0">周日</option><option value="5">周五</option></select></label>
+                  <label>时间<select id="reportHour"><option value="9">09:00</option><option value="18">18:00</option><option value="20">20:00</option></select></label>
+                </div>
+                <button type="submit">保存周报设置</button>
+              </form>
+              <p id="cloudMessage" class="field-hint" aria-live="polite"></p>
+              <button id="signOutBtn" type="button">退出登录</button>
+            </div>
+          </section>
         </section>
 
         <header class="topbar module-section" data-module="calendar">
@@ -493,7 +500,7 @@
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.111.0/dist/umd/supabase.min.js" crossorigin="anonymous"></script>
     <script src="supabase-config.js?v=1"></script>
-    <script src="app.js?v=47"></script>
-    <script src="cloud.js?v=1"></script>
+    <script src="app.js?v=48"></script>
+    <script src="cloud.js?v=2"></script>
   </body>
 </html>
