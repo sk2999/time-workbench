@@ -17,6 +17,15 @@
   --shadow-soft: 0 8px 20px rgba(40, 48, 60, 0.06);
 }
 
+.cloud-panel { margin-top: 12px; }
+.cloud-panel .section-title { align-items: center; }
+.cloud-auth input { width: 100%; }
+.cloud-choice { display: grid; gap: 8px; padding: 12px; border: 1px solid var(--line); border-radius: 12px; background: #f7f8fa; }
+.cloud-choice p { margin: 0; }
+.check-row { display: flex !important; align-items: center; gap: 8px; }
+.check-row input { width: auto; }
+.error-text { color: #c73b31; }
+
 * {
   box-sizing: border-box;
 }

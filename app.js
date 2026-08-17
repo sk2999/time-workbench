@@ -106,6 +106,18 @@ bindEvents();
 render();
 syncTicker();
 
+window.TimeBoardApp = Object.freeze({
+  getState: () => JSON.parse(JSON.stringify(state)),
+  replaceState(nextState) {
+    Object.assign(state, normalizeImportedState(nextState));
+    rebuildProgressFromEntries();
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+    render();
+    syncTicker();
+  },
+  hasUserData: () => state.goals.length > 0 || state.entries.length > 0 || Boolean(state.activeEntry),
+});
+
 function loadState() {
   const raw = localStorage.getItem(STORAGE_KEY) || LEGACY_KEYS.map((key) => localStorage.getItem(key)).find(Boolean);
   if (!raw) {
@@ -250,6 +262,7 @@ function getPriorityLabel(value) {
 
 function saveState() {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+  window.dispatchEvent(new CustomEvent("time-board-state-saved"));
 }
 
 function exportData() {

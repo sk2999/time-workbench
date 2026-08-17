@@ -43,6 +43,37 @@
           <p id="dataStatus" class="field-hint" aria-live="polite"></p>
         </section>
 
+        <section class="panel cloud-panel">
+          <div class="section-title compact-title">
+            <h2>云端同步与周报</h2>
+            <span id="cloudState" class="status-pill">未登录</span>
+          </div>
+          <form id="authForm" class="stack cloud-auth">
+            <label>邮箱<input id="authEmail" type="email" autocomplete="email" required placeholder="用于登录和接收周报" /></label>
+            <label>密码<input id="authPassword" type="password" autocomplete="current-password" minlength="6" required placeholder="至少 6 位" /></label>
+            <div class="button-row"><button type="submit" class="primary">登录</button><button id="signUpBtn" type="button">注册</button></div>
+          </form>
+          <div id="cloudAccount" class="stack" hidden>
+            <p id="cloudEmail" class="field-hint"></p>
+            <div id="migrationChoice" class="cloud-choice" hidden>
+              <strong>选择第一次同步方式</strong>
+              <p class="field-hint">本地记录不会被自动覆盖。</p>
+              <button id="uploadLocalBtn" type="button" class="primary">上传本地数据</button>
+              <button id="useCloudBtn" type="button">使用云端数据</button>
+            </div>
+            <form id="reportPreferences" class="stack" hidden>
+              <label class="check-row"><input id="reportEnabled" type="checkbox" checked />每周自动生成并发送</label>
+              <div class="time-inputs">
+                <label>发送日<select id="reportDay"><option value="1">周一</option><option value="0">周日</option><option value="5">周五</option></select></label>
+                <label>时间<select id="reportHour"><option value="9">09:00</option><option value="18">18:00</option><option value="20">20:00</option></select></label>
+              </div>
+              <button type="submit">保存周报设置</button>
+            </form>
+            <p id="cloudMessage" class="field-hint" aria-live="polite"></p>
+            <button id="signOutBtn" type="button">退出登录</button>
+          </div>
+        </section>
+
         <section class="panel timer-panel module-card" data-module="record">
           <div class="section-title">
             <h2>当前记录</h2>
@@ -460,6 +491,9 @@
       </section>
     </div>
 
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.111.0/dist/umd/supabase.min.js" crossorigin="anonymous"></script>
+    <script src="supabase-config.js?v=1"></script>
     <script src="app.js?v=47"></script>
+    <script src="cloud.js?v=1"></script>
   </body>
 </html>
